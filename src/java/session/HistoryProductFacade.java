@@ -5,6 +5,7 @@
  */
 package session;
 
+import entity.HistoryProduct;
 import entity.Product;
 import entity.Users;
 import java.util.List;
@@ -17,7 +18,7 @@ import javax.persistence.PersistenceContext;
  * @author ban31
  */
 @Stateless
-public class ProductFacade extends AbstractFacade<Product> {
+public class HistoryProductFacade extends AbstractFacade<HistoryProduct> {
     @PersistenceContext(unitName = "SuperShopPU")
     private EntityManager em;
 
@@ -26,17 +27,19 @@ public class ProductFacade extends AbstractFacade<Product> {
         return em;
     }
 
-    public ProductFacade() {
-        super(Product.class);
+    public HistoryProductFacade() {
+        super(HistoryProduct.class);
     }
     
-    public List<Product> findByUser(Users users) {
+    public void removeByProduct(Product delete) {
         try {
-            return em.createQuery("SELECT ur.product FROM HistoryProduct ur WHERE ur.users = :users")
-                    .setParameter("users", users)
-                   .getResultList();
+            em.createQuery("DELETE FROM HistoryProduct ur WHERE ur.product = :product")
+                    .setParameter("product", delete)
+                    .executeUpdate();
+            em.flush();
         } catch (Exception e) {
-            return null;
+            
         }
     }
+    
 }

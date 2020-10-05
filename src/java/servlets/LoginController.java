@@ -14,7 +14,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import session.UsersFacade;
+import utils.MakeHash;
 
 /**
  *
@@ -47,6 +49,7 @@ public class LoginController extends HttpServlet {
         switch (path) {
             case "/index":
                 request.getRequestDispatcher("/index.jsp").forward(request, response);
+                
                 break;
             case "/showFormAddUser":
                 request.getRequestDispatcher("/showAddUser.jsp").forward(request, response);
@@ -55,7 +58,11 @@ public class LoginController extends HttpServlet {
                 String login = request.getParameter("login");
                 String password = request.getParameter("password");
                 String money = request.getParameter("money");
-                Users users = new Users(login, password, Long.parseLong(money) ,"Defaultrole");
+                MakeHash makeHash = new MakeHash();
+                String salts = makeHash.createSalts();
+                String encodingPassword = makeHash.createHash(password, salts);
+                
+                Users users = new Users(login, encodingPassword, Long.parseLong(money) ,"Defaultrole",salts);
                 usersFacade.create(users);
                 request.setAttribute("info", "Пользователь создан");
                 request.getRequestDispatcher("/index.jsp").forward(request, response);
@@ -64,10 +71,35 @@ public class LoginController extends HttpServlet {
                  request.getRequestDispatcher("/showFormLogin.jsp").forward(request, response);
                 break;
             case "/login":
+                login = request.getParameter("login");
+                password = request.getParameter("password");
+                users = usersFacade.fingByLogin(login);
+                if(users == null){
+                     request.setAttribute("info", "Нет такого логина или пароля");
+                    request.getRequestDispatcher("/showFormLogin")
+                        .forward(request, response);
+                }
+                MakeHash mh = new MakeHash();
+                String encriptPassword = mh.createHash(password,users.getSalts());
+                if(!encriptPassword.equals(users.getPassword())){
+                    request.setAttribute("info", "Нет такого логина или пароля");
+                    request.getRequestDispatcher("/showFormLogin")
+                        .forward(request, response);
+                }
                 
+                HttpSession session = request.getSession(true);
+                session.setAttribute("users", users);
+                request.setAttribute("info", "Привет, "+users.getLogin());
+                request.setAttribute("showMoney", "Ваш Баланс: "+users.getMoney()+" евро");
+                request.setAttribute("users", users);
+                request.getRequestDispatcher("/index.jsp")
+                        .forward(request, response);
                 break;
             case "/logout":
-                
+                session = request.getSession(false);
+                if(session != null) session.invalidate();
+                request.setAttribute("info", "Вы вышли");
+                response.sendRedirect("index.jsp");
                 break;
             
         }

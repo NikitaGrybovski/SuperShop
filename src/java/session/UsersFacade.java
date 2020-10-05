@@ -28,4 +28,16 @@ public class UsersFacade extends AbstractFacade<Users> {
         super(Users.class);
     }
     
+    public Users fingByLogin(String login){
+        try {
+            return (Users) em.createQuery("SELECT u FROM Users u WHERE u.login = :login")
+                .setParameter("login", login)
+                .getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+        
+    }
+    
+    
 }

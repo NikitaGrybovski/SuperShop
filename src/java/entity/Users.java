@@ -27,15 +27,17 @@ public class Users implements Serializable {
     private String password;
     private Long money;
     private String role;
+    private String salts;
 
     public Users() {
     }
 
-    public Users(String login, String password, Long money, String role) {
+    public Users(String login, String password, Long money, String role, String salts) {
         this.login = login;
         this.password = password;
         this.money = money;
         this.role = role;
+        this.salts = salts;
     }
 
     public Long getId() {
@@ -78,14 +80,23 @@ public class Users implements Serializable {
         this.role = role;
     }
 
+    public String getSalts() {
+        return salts;
+    }
+
+    public void setSalts(String salts) {
+        this.salts = salts;
+    }
+
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 47 * hash + Objects.hashCode(this.id);
-        hash = 47 * hash + Objects.hashCode(this.login);
-        hash = 47 * hash + Objects.hashCode(this.password);
-        hash = 47 * hash + Objects.hashCode(this.money);
-        hash = 47 * hash + Objects.hashCode(this.role);
+        int hash = 3;
+        hash = 41 * hash + Objects.hashCode(this.id);
+        hash = 41 * hash + Objects.hashCode(this.login);
+        hash = 41 * hash + Objects.hashCode(this.password);
+        hash = 41 * hash + Objects.hashCode(this.money);
+        hash = 41 * hash + Objects.hashCode(this.role);
+        hash = 41 * hash + Objects.hashCode(this.salts);
         return hash;
     }
 
@@ -113,13 +124,18 @@ public class Users implements Serializable {
         if (!Objects.equals(this.role, other.role)) {
             return false;
         }
+        if (!Objects.equals(this.salts, other.salts)) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toString() {
-        return "Users{" + "id=" + id + ", login=" + login + ", password=" + password + ", money=" + money + ", role=" + role + '}';
+        return "Users{" + "id=" + id + ", login=" + login + ", password=" + password + ", money=" + money + ", role=" + role + ", salts=" + salts + '}';
     }
+
+   
 
     
     
